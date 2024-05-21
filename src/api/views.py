@@ -1,12 +1,14 @@
 from rest_framework import viewsets
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
+from rest_framework import decorators
 
 from .models import Facility
 from .serializers import FacilitySerializer
 
 # Create your views here.
 class FacilityViewSet(viewsets.ViewSet):
+    lookup_field = 'facility_id'
 
     def list(self, req):
         """
@@ -16,12 +18,12 @@ class FacilityViewSet(viewsets.ViewSet):
         serializer = FacilitySerializer(queryset, many=True)
         return Response(serializer.data)
     
-    def retrieve(self, req, pk=None):
+    def retrieve(self, req, facility_id=None):
         """
         詳細画面
         """
         queryset = Facility.objects.all()
-        facility = get_object_or_404(queryset, pk=pk)
+        facility = get_object_or_404(queryset, id=facility_id)
         serializer = FacilitySerializer(facility)
         return Response(serializer.data)
     
@@ -31,3 +33,18 @@ class FacilityViewSet(viewsets.ViewSet):
             serializer.save()
             return Response(serializer.data, status=201)
         return Response(serializer.data, status=400)
+    
+    # detail=False なので、詳細画面配下には付与されない
+    @decorators.action(detail=False, methods=['get'])
+    def filter_list(self, req):
+        params = req.query_params
+        if 'name' in params.keys():
+            queryset = Facility.objects.filter(name__contains=params['name'])
+            serializer = FacilitySerializer(queryset, many=True)
+            return Response(serializer.data)
+        return Response({'error': 'No such record.'})
+    
+    # detail=False なので、詳細画面配下に付与される
+    @decorators.action(detail=True, methods=['get'])
+    def custom_action(self, req, facility_id=None):
+        return Response({'detail': 'テスト'})
