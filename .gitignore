@@ -1,0 +1,20 @@
+# Ignore python venv files.
+**/include
+**/Lib
+**/Scripts
+pyvenv.cfg
+
+# Ignore pycache file.
+**/__pycache__
+
+# ignore api_keys file
+api_keys/**
+
+# ignore log file
+**.log
+
+# ignore secret setting file
+**.env
+
+#ignore api key
+**src/*.json
