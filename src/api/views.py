@@ -3,8 +3,8 @@ from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from rest_framework import decorators
 
-from .models import Facility
-from .serializers import FacilitySerializer
+from .models import Equipment, Facility
+from .serializers import EquipmentSerializer, FacilitySerializer
 
 # Create your views here.
 class FacilityViewSet(viewsets.ViewSet):
@@ -32,7 +32,7 @@ class FacilityViewSet(viewsets.ViewSet):
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(serializer.data, status=201)
-        return Response(serializer.data, status=400)
+        return Response(serializer.errors, status=400)
     
     # detail=False なので、詳細画面配下には付与されない
     @decorators.action(detail=False, methods=['get'])
@@ -48,3 +48,23 @@ class FacilityViewSet(viewsets.ViewSet):
     @decorators.action(detail=True, methods=['get'])
     def custom_action(self, req, facility_id=None):
         return Response({'detail': 'テスト'})
+
+
+class EquipmentViewSet(viewsets.GenericViewSet):
+    queryset = Equipment.objects.all()
+    serializer_class = EquipmentSerializer
+
+    def list(self, req):
+        """
+        一覧画面
+        """
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+    
+    def create(self, req):
+        serializer = self.get_serializer(data=req.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=404)

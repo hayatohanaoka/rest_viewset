@@ -10,3 +10,14 @@ class Facility(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Equipment(models.Model):
+    class Meta:
+        db_table = 'tbl_equipments'
+    name = models.CharField(max_length=200)
+    quantity = models.IntegerField()
+    facility = models.ForeignKey(Facility, on_delete=models.CASCADE, related_name='equipments')
+
+    def __str__(self):
+        return f'{self.facility.name}: {self.nama}({self.quantity})'
