@@ -28,11 +28,23 @@ class FacilityViewSet(viewsets.ViewSet):
         return Response(serializer.data)
     
     def create(self, req):
+        """
+        Facility レコードの作成
+        """
         serializer = FacilitySerializer(data=req.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
+    
+    def destroy(self, req, facility_id=None):
+        """
+        Facility レコードの削除
+        """
+        queryset = Facility.objects.all()
+        facility = get_object_or_404(queryset, id=facility_id)
+        facility.delete()
+        return Response({'result': 'Delete Success'})
     
     # detail=False なので、詳細画面配下には付与されない
     @decorators.action(detail=False, methods=['get'])
@@ -51,6 +63,7 @@ class FacilityViewSet(viewsets.ViewSet):
 
 
 class EquipmentViewSet(viewsets.GenericViewSet):
+    lookup_field = 'equipment_id'
     queryset = Equipment.objects.all()
     serializer_class = EquipmentSerializer
 
@@ -62,9 +75,27 @@ class EquipmentViewSet(viewsets.GenericViewSet):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
     
+    def retrieve(self, req, equipment_id=None):
+        queryset = self.get_queryset()
+        equipment = get_object_or_404(queryset, id=equipment_id)
+        serializer = self.get_serializer(equipment)
+        return Response(serializer.data)
+    
     def create(self, req):
+        """
+        Equipment レコードの作成
+        """
         serializer = self.get_serializer(data=req.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=404)
+    
+    def destroy(self, req, equipment_id=None):
+        """
+        Equipment レコードの削除
+        """
+        queryset = self.get_queryset()
+        equipment = get_object_or_404(queryset, id=equipment_id)
+        equipment.delete()
+        return Response({'result': 'Delete Success'})
