@@ -1,10 +1,12 @@
 from rest_framework import viewsets
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
-from rest_framework import decorators
+from rest_framework import decorators, mixins
+from django_filters.rest_framework import DjangoFilterBackend
 
-from .models import Equipment, Facility
-from .serializers import EquipmentSerializer, FacilitySerializer
+from .models import Equipment, Facility, FacilityType
+from .serializers import EquipmentSerializer, FacilitySerializer, FacilityTypeSerializer
+from .paginations import EquipmentPagination
 
 # Create your views here.
 class FacilityViewSet(viewsets.ViewSet):
@@ -62,18 +64,21 @@ class FacilityViewSet(viewsets.ViewSet):
         return Response({'detail': 'テスト'})
 
 
-class EquipmentViewSet(viewsets.GenericViewSet):
+class EquipmentViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     lookup_field = 'equipment_id'
     queryset = Equipment.objects.all()
     serializer_class = EquipmentSerializer
+    pagination_class = EquipmentPagination
+    filter_backends = (DjangoFilterBackend,)
+    filterset_fields = ('name', 'facility__name')
 
-    def list(self, req):
-        """
-        一覧画面
-        """
-        queryset = self.get_queryset()
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+    # def list(self, req):
+    #     """
+    #     一覧画面
+    #     """
+    #     queryset = self.get_queryset()
+    #     serializer = self.get_serializer(queryset, many=True)
+    #     return Response(serializer.data)
     
     def retrieve(self, req, equipment_id=None):
         queryset = self.get_queryset()
@@ -99,3 +104,9 @@ class EquipmentViewSet(viewsets.GenericViewSet):
         equipment = get_object_or_404(queryset, id=equipment_id)
         equipment.delete()
         return Response({'result': 'Delete Success'})
+
+
+class FacilityTypeViewSet(viewsets.ReadOnlyModelViewSet):
+    model = FacilityType
+    queryset = FacilityType.objects.all()
+    serializer_class = FacilityTypeSerializer

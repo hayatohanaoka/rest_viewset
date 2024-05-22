@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Equipment, Facility
+from .models import Equipment, Facility, FacilityType
 
 class FacilitySerializer(serializers.ModelSerializer):
     class Meta:
@@ -14,3 +14,9 @@ class EquipmentSerializer(serializers.ModelSerializer):
         model = Equipment
         fields = ('id', 'name', 'quantity', 'facility')
         read_only_fields = ('id',)
+
+
+class FacilityTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FacilityType
+        fields = ('id', 'type', 'facility')
