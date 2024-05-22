@@ -3,9 +3,18 @@ from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from rest_framework import decorators, mixins
 from django_filters.rest_framework import DjangoFilterBackend
+from django.contrib import auth
+from django.contrib.auth.models import User
 
 from .models import Equipment, Facility, FacilityType
-from .serializers import EquipmentSerializer, FacilitySerializer, FacilityTypeSerializer
+from .serializers import (
+    EquipmentSerializer,
+    FacilitySerializer,
+    FacilityTypeSerializer,
+    UserRegistSerializer,
+    UserLoginSerializer,
+    UserUpdateSerializer
+)
 from .paginations import EquipmentPagination
 
 # Create your views here.
@@ -110,3 +119,72 @@ class FacilityTypeViewSet(viewsets.ReadOnlyModelViewSet):
     model = FacilityType
     queryset = FacilityType.objects.all()
     serializer_class = FacilityTypeSerializer
+
+
+class UserViewSet(viewsets.ViewSet):
+    model = User
+    queryset = User.objects.all()
+    serializer_class = UserRegistSerializer
+    login_serializer_class = UserLoginSerializer
+    update_serializer_class = UserUpdateSerializer
+    lookup_field = 'user_id'
+
+    def list(self, req):
+        """
+        一覧画面
+        """
+        serializer = self.serializer_class(self.queryset, many=True)
+        return Response(serializer.data)
+    
+    def retrieve(self, req, user_id=None):
+        """
+        詳細画面
+        """
+        queryset = get_object_or_404(self.queryset, id=user_id)
+        serializer = self.serializer_class(queryset)
+        return Response(serializer.data)
+
+    @decorators.action(detail=False, methods=['post'])
+    def regist(self, req):
+        """
+        作成処理
+        """
+        serializer = self.serializer_class(data=req.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=404)
+
+    @decorators.action(detail=False, methods=['patch'])
+    def patch_profile(self, req):
+        """
+        更新処理
+        """
+        serializer = self.update_serializer_class(
+            context={'user': req.user},
+            data=req.data
+        )
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
+
+    @decorators.action(detail=False, methods=['post'])
+    def login(self, req):
+        """
+        認証処理
+        """
+        serializer = self.login_serializer_class(data=req.data)
+        if serializer.is_valid(raise_exception=True):
+            user = auth.authenticate(
+                request=req,
+                username=req.data['username'],
+                password=req.data['password']
+            )
+
+            if not user:
+                return Response(serializer.errors, status=401)
+            
+            auth.login(req, user)
+            return Response(serializer.data, status=200)
+        return Response(serializer.data, status=400)
