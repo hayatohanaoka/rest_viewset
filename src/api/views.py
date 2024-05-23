@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
-from rest_framework import decorators, mixins
+from rest_framework import decorators, mixins, permissions
 from django_filters.rest_framework import DjangoFilterBackend
 from django.contrib import auth
 from django.contrib.auth.models import User
@@ -128,6 +128,7 @@ class UserViewSet(viewsets.ViewSet):
     login_serializer_class = UserLoginSerializer
     update_serializer_class = UserUpdateSerializer
     lookup_field = 'user_id'
+    permission_classes = (permissions.AllowAny,)
 
     def list(self, req):
         """
@@ -152,7 +153,7 @@ class UserViewSet(viewsets.ViewSet):
         serializer = self.serializer_class(data=req.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
-            return Response(serializer.data)
+            return Response(serializer.data, status=201)
         return Response(serializer.errors, status=404)
 
     @decorators.action(detail=False, methods=['patch'])
@@ -183,7 +184,7 @@ class UserViewSet(viewsets.ViewSet):
             )
 
             if not user:
-                return Response(serializer.errors, status=401)
+                return Response(serializer.errors, status=400)
             
             auth.login(req, user)
             return Response(serializer.data, status=200)
