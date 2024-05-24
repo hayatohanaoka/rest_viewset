@@ -5,7 +5,8 @@ from .views import (
     EquipmentViewSet,
     FacilityViewSet,
     FacilityTypeViewSet,
-    UserViewSet
+    UserViewSet,
+    UserPictureViewSet
 )
 
 router = DefaultRouter()
@@ -18,6 +19,10 @@ router.register(
 )
 router.register(
     'facility_type', FacilityTypeViewSet, basename='facility_type'
+)
+# パターンマッチの順番関係で、これを先にする必要性がある
+router.register(
+    'user', UserPictureViewSet, basename='user_picture'
 )
 router.register(
     'user', UserViewSet, basename='user'

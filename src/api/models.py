@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 # Create your models here.
 class Facility(models.Model):
@@ -33,3 +34,11 @@ class FacilityType(models.Model):
     
     def __str__(self):
         return f'{self.facility.name}: {self.type}'
+
+
+class UserPicture(models.Model):
+    class Meta:
+        db_table = 'tbl_user_images'
+    
+    image = models.ImageField(upload_to='media/images/')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='images')

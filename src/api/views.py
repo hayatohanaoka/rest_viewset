@@ -6,14 +6,15 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.contrib import auth
 from django.contrib.auth.models import User
 
-from .models import Equipment, Facility, FacilityType
+from .models import Equipment, Facility, FacilityType, UserPicture
 from .serializers import (
     EquipmentSerializer,
     FacilitySerializer,
     FacilityTypeSerializer,
     UserRegistSerializer,
     UserLoginSerializer,
-    UserUpdateSerializer
+    UserUpdateSerializer,
+    UserPictureSerializer
 )
 from .paginations import EquipmentPagination
 
@@ -189,3 +190,34 @@ class UserViewSet(viewsets.ViewSet):
             auth.login(req, user)
             return Response(serializer.data, status=200)
         return Response(serializer.data, status=400)
+
+
+class UserPictureViewSet(viewsets.GenericViewSet):
+    serializer_class = UserPictureSerializer
+    model = UserPicture
+
+    def get_queryset(self):
+        """
+        一覧に表示するデータを取得
+        """
+        return self.model.objects.filter(user_id=self.request.user).all()
+
+    @decorators.action(detail=False, methods=['post'])
+    def upload_picture(self, req):
+        """
+        POSTによる画像アップロード
+        """
+        serializer = self.get_serializer(data=req.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save(user=req.user)
+            return Response(serializer.data, status=200)
+        return Response(serializer.errors, status=400)
+    
+    @upload_picture.mapping.get
+    def get_upload_picture(self, req):
+        """
+        GETによる画像一覧表示
+        """
+        user_picture = self.get_queryset()
+        serializer = self.get_serializer(user_picture, many=True)
+        return Response(serializer.data, status=200)

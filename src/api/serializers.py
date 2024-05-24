@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib import auth
 
-from .models import Equipment, Facility, FacilityType
+from .models import Equipment, Facility, FacilityType, UserPicture
 
 class FacilitySerializer(serializers.ModelSerializer):
     class Meta:
@@ -65,3 +65,9 @@ class UserUpdateSerializer(serializers.Serializer):
         if 'last_name'  in data_keys: user.last_name  = self.validated_data['last_name']
         user.save()
         return user
+
+
+class UserPictureSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserPicture
+        fields = ('image',)
