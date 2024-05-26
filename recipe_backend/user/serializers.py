@@ -25,3 +25,14 @@ class UserRegistSerializer(serializers.Serializer):
             age= self.validated_data['age']
         )
         return user
+
+
+class UserLoginSerializer(serializers.Serializer):
+    email = serializers.CharField()
+    password = serializers.CharField(write_only=True)
+
+    def validate(self, data):
+        data_keys = data.keys()
+        if 'email' not in data_keys or 'password' not in data_keys:
+            raise serializers.ValidationError('入力項目が不足しています')
+        return data

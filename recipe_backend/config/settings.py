@@ -128,3 +128,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Change auth user
 AUTH_USER_MODEL = 'user.CustomUser'
+
+REST_FRAMEWWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticationOrReadOnly'
+    ]
+}
