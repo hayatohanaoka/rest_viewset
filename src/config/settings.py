@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # Add my apps
+    'drf_spectacular',
     'django_filters',
     'rest_framework',
     'api',
@@ -132,5 +133,21 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticatedOrReadOnly'
-    ]
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication'
+    ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema'
+}
+
+def read_key_file(file_name):
+    with open(Path.joinpath(BASE_DIR, 'keys', file_name), 'r') as f:
+        key = f.read()
+    f.close()
+    return key
+
+SIMPLE_JWT = {
+    'ALGORITHM': 'RS256',
+    'SIGNING_KEY': read_key_file('private_key.pem'),
+    'VERIFYING_KEY': read_key_file('public_key.pem')
 }

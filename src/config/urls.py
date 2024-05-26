@@ -18,8 +18,15 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls import static
 from django.conf import settings
+from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api_token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api_token/refresh', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api_token/verify', TokenVerifyView.as_view(), name='token_verify'),
     path('api/', include('api.urls')),
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(), name='swagger-ui'),
 ] + static.static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
