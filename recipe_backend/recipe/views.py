@@ -1,5 +1,6 @@
-from rest_framework import viewsets, mixins, permissions, decorators
-from rest_framework.response import Response
+from rest_framework import viewsets
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import OrderingFilter, SearchFilter
 
 from .models import Recipe, Ingredient
 from .serializers import RecipesSerializer, IngredientSerializer
@@ -20,6 +21,9 @@ class RecipeViewSet(RequestViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipesSerializer
     model = Recipe
+    filter_backends = (DjangoFilterBackend, OrderingFilter)
+    filterset_fields = ('title',)
+    ordering_fields = ('id', 'title', 'created_at', 'updated_at')
 
 
 class IngredientViewSet(RequestViewSet):

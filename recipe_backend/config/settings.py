@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # my apps
     'rest_framework',
+    'rest_framework.authtoken',
+    'django_filters',
     'user',
     'recipe',
 ]
@@ -132,5 +134,8 @@ AUTH_USER_MODEL = 'user.CustomUser'
 REST_FRAMEWWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticationOrReadOnly'
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication'
     ]
 }
