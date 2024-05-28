@@ -31,7 +31,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     )
 
     user_permissions = models.ManyToManyField(
-        'auth.permission',
+        'auth.Permission',
         blank=True,
         related_name='custom_users'
     )
