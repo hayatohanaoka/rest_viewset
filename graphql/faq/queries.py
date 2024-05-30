@@ -9,8 +9,8 @@ class Query(graphene.ObjectType):
     all_questions = DjangoListField(QuestionType)
     all_categories = DjangoListField(CategoryType)
     # resolve_~ でオブジェクトの取得をカスタマイズできる
-    all_answers = graphene.List(AnswerType, id=graphene.Int(), content=graphene.String())
-    question = graphene.Field(QuestionType, id=graphene.Int())
+    all_answers = graphene.List(AnswerType, id=graphene.Int(), content=graphene.String())  # 複数取得
+    question = graphene.Field(QuestionType, id=graphene.Int())  # 単一取得
     categories_field_by_name = graphene.Field(CategoryType, name=graphene.String())
 
     def resolve_categories_field_by_name(root, info, **kwargs):
