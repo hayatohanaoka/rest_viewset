@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # My apps
     'graphene_django',
-    'faq'
+    'faq',
+    'user'
 ]
 
 MIDDLEWARE = [
