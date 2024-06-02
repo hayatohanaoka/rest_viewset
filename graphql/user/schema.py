@@ -2,6 +2,35 @@ import random
 import requests
 
 import graphene
+from graphql import GraphQLError
+
+class MediaType(graphene.Interface):
+    id = graphene.ID(required=True)
+    title = graphene.String(required=True)
+
+
+class BookType(graphene.ObjectType):
+    author = graphene.String()
+
+    class Meta:
+        interfaces = (MediaType,)
+
+
+class MovieType(graphene.ObjectType):
+    director = graphene.String()
+
+    class Meta:
+        interfaces = (MediaType,)
+
+books = [
+    BookType(id='b1', title='book1', author='author1'),
+    BookType(id='b2', title='book2', author='author2')
+]
+
+movies = [
+    MovieType(id='m1', title='movie1', director='director1'),
+    MovieType(id='m2', title='movie2', director='director2')
+]
 
 class Address(graphene.ObjectType):
     city = graphene.String()
@@ -83,14 +112,32 @@ class UserAPIType(graphene.ObjectType):
                     )
                 )
             )
-        print(res_users)
         return res_users
 
 
 class Query(graphene.ObjectType):
     user_query = graphene.Field(UserType)
     user_api_query = graphene.Field(UserAPIType)
+    search_medias = graphene.List(MediaType)
+    search_media = graphene.Field(
+        MediaType,
+        id=graphene.ID(required=True)
+    )
 
+    def resolve_search_medias(parent, info):
+        return books + movies
+
+    def resolve_search_media(parent, info, id):
+        for book in books:
+            if book.id == id:
+                return book
+        
+        for movie in movies:
+            if movie.id == id:
+                return movie
+        
+        return GraphQLError(f'id: {id}の対象が存在しません')
+        
     def resolve_user_query(parent, info):
         return UserType()
     
@@ -98,4 +145,4 @@ class Query(graphene.ObjectType):
         return UserAPIType()
 
 
-schema = graphene.Schema(query=Query)
+schema = graphene.Schema(query=Query, types=[BookType, MovieType])
