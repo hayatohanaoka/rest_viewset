@@ -1,8 +1,9 @@
 import graphene
+from graphql import GraphQLError
 from graphene_django import DjangoListField
 
 from .models import Category, Question, Answer
-from .object_types import AnswerType, CategoryType, QuestionType
+from .object_types import AnswerType, CategoryType, QuestionType, QAInterface
 
 class SearchUnion(graphene.Union):
     class Meta:
@@ -67,6 +68,27 @@ class Query2(graphene.ObjectType):
     GraphQL のクエリフィールドをまとめるためのクラス
     """
     question_query = graphene.Field(Query)
+    search_qas = graphene.List(QAInterface, q=graphene.String())
+    search_qa = graphene.Field(QAInterface, q=graphene.String())
 
     def resolve_question_query(parent, info):
         return Query()
+
+    def resolve_search_qa(parent, info, q):
+        question = Question.objects.filter(content__contains=q).first()
+        if question:
+            return question
+        
+        answer = Answer.objects.filter(content__contains=q).first()
+        if answer:
+            return answer
+        return GraphQLError(f'{q}に対応する対象が見つかりませんでした。')
+    
+    def resolve_search_qas(parent, info, q):
+        questions = Question.objects.filter(content__contains=q)
+        answers = Answer.objects.filter(content__contains=q)
+        combined_list = list(questions) + list(answers)
+
+        if combined_list:
+            return combined_list
+        return GraphQLError(f'{q}に対応する対象が見つかりませんでした。')
