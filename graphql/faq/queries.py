@@ -4,6 +4,10 @@ from graphene_django import DjangoListField
 from .models import Category, Question, Answer
 from .object_types import AnswerType, CategoryType, QuestionType
 
+class SearchUnion(graphene.Union):
+    class Meta:
+        types = (CategoryType, QuestionType)
+
 class Query(graphene.ObjectType):
     # 自動で一覧取得
     all_questions = DjangoListField(QuestionType)
@@ -12,6 +16,25 @@ class Query(graphene.ObjectType):
     all_answers = graphene.List(AnswerType, id=graphene.Int(), content=graphene.String())  # 複数取得
     question = graphene.Field(QuestionType, id=graphene.Int())  # 単一取得
     categories_field_by_name = graphene.Field(CategoryType, name=graphene.String())
+    search_result = graphene.List(SearchUnion, term=graphene.String())
+    search_results = graphene.List(SearchUnion, term=graphene.String())
+
+    def resolve_search_result(root, info, term=''):
+        category = Category.objects.filter(name__contains=term)
+        if category:
+            return category
+        question = Question.objects.filter(title__contains=term).first()
+        return question
+
+
+    def resolve_search_results(root, info, term=''):
+        if term:
+            categories = Category.objects.filter(name__contains=term)
+            questions = Question.objects.filter(title__contains=term) 
+        else:
+            categories = Category.objects.all()
+            questions = Question.objects.all()
+        return list(categories) + list(questions)
 
     def resolve_categories_field_by_name(root, info, **kwargs):
         return Category.objects.get(**kwargs)
