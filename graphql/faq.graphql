@@ -1,0 +1,67 @@
+schema {
+  query: Query2
+  mutation: Mutation
+}
+
+"""GraphQL のクエリフィールドをまとめるためのクラス"""
+type Query2 {
+  questionQuery: Query
+}
+
+type Query {
+  allQuestions: [QuestionType!]
+  allCategories: [CategoryType!]
+  allAnswers(id: Int, content: String): [AnswerType]
+  question(id: Int): QuestionType
+  categoriesFieldByName(name: String): CategoryType
+}
+
+type QuestionType {
+  id: ID!
+  title: String!
+  content: String!
+  category: CategoryType!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  isPublished: Boolean!
+  answers: [AnswerType!]!
+}
+
+type CategoryType {
+  id: ID!
+  name: String!
+  description: String
+}
+
+"""
+The `DateTime` scalar type represents a DateTime
+value as specified by
+[iso8601](https://en.wikipedia.org/wiki/ISO_8601).
+"""
+scalar DateTime
+
+type AnswerType {
+  id: ID!
+  content: String!
+  question: QuestionType!
+  updatedAt: DateTime!
+}
+
+"""各ミューテーションをまとめ上げるクラス"""
+type Mutation {
+  createQuestion(categoryId: Int, content: String, title: String): CreateQuestion
+  updateQuestion(content: String, questionId: ID, title: String): UpdateQuestion
+  deleteQuestion(questionId: Int): DeleteQuestion
+}
+
+type CreateQuestion {
+  question: QuestionType
+}
+
+type UpdateQuestion {
+  question: QuestionType
+}
+
+type DeleteQuestion {
+  isDeleted: Boolean
+}
