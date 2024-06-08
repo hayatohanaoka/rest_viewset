@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 
 # Create your models here.
-class TODO(models.Model):
+class ToDo(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField()
     priority = models.IntegerField()
@@ -12,6 +12,8 @@ class TODO(models.Model):
 
     class Meta:
         db_table = 'tbl_tasks'
+        # ここがないとデフォルトのorderingが未定義になるため、runserverでエラーになる
+        ordering= ('id',) 
 
 
 class Column(models.Model):
@@ -21,3 +23,5 @@ class Column(models.Model):
 
     class Meta:
         db_table = 'tbl_columns'
+        # ここがないとデフォルトのorderingが未定義になるため、runserverでエラーになる
+        ordering= ('id',)
