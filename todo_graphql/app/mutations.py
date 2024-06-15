@@ -10,7 +10,7 @@ class CreateColumnMutation(graphene.relay.ClientIDMutation):
         title = graphene.String(required=True)
         description = graphene.String(required=True)
 
-    column = graphene.Field(ColumnNode)
+    column = graphene.Field(ColumnNode)  # 返り値を格納するためのフィールド
 
     @classmethod
     def mutate_and_get_payload(cls, root, info, **inputs):
@@ -28,7 +28,7 @@ class UpdateColumnMutation(graphene.relay.ClientIDMutation):
         title = graphene.String()
         description = graphene.String()
 
-    column = graphene.Field(ColumnNode)
+    column = graphene.Field(ColumnNode)  # 返り値を格納するためのフィールド
 
     @classmethod
     def mutate_and_get_payload(cls, root, info, **inputs):
@@ -53,7 +53,7 @@ class DeleteColumnMutation(graphene.relay.ClientIDMutation):
     class Input:
         column_id = graphene.ID(required=True)
 
-    ok = graphene.Boolean()
+    ok = graphene.Boolean()  # 返り値を格納するためのフィールド
 
     @classmethod
     def mutate_and_get_payload(cls, root, info, **inputs):
@@ -63,6 +63,7 @@ class DeleteColumnMutation(graphene.relay.ClientIDMutation):
         column.delete()
 
         return DeleteColumnMutation(ok=True)
+
 
 class Mutation(graphene.ObjectType):
     create_column = CreateColumnMutation.Field()
