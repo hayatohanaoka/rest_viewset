@@ -14,10 +14,11 @@ class CreateColumnMutation(graphene.relay.ClientIDMutation):
 
     @classmethod
     def mutate_and_get_payload(cls, root, info, **inputs):
+        user = info.context.user
         title = inputs['title']
         description = inputs['description']
         column = Column.objects.create(
-            title=title, description=description, user_id=1)
+            title=title, description=description, user_id=user)
         
         return CreateColumnMutation(column=column)
 
