@@ -32,11 +32,26 @@ class ColumnNode(DjangoObjectType):
         fields = '__all__'
 
 
+class OrderByEnum(graphene.Enum):
+    TITLE_ASC = 'title'
+    TITLE_DESC = '-title'
+    PRIORITY_ASC = 'priority'
+    PRIORITY_DESC = '-priority'
+
+
 class ToDoQuery(graphene.ObjectType):
     # 内部でリゾルバを持っているので、定義の必要なし
     todo = graphene.relay.Node.Field(ToDoNode)
-    all_todos = DjangoFilterConnectionField(ToDoNode)
+    all_todos = DjangoFilterConnectionField(ToDoNode, orderBy=graphene.List(of_type=OrderByEnum))
     todo_by_global_id = graphene.Field(ToDoNode, global_id=graphene.ID(required=True))
+
+    def resolve_all_todos(root, info, **kwargs):
+        query_set = ToDo.objects.all()
+        if 'orderBy' in kwargs:
+            # OrderByEnumクラスの各プロパティの値を取得する
+            order_by_fields = [command.value for command in kwargs['orderBy']]
+            query_set = query_set.order_by(*order_by_fields)
+        return query_set
 
     def resolve_todo_by_global_id(root, info, global_id):
         try:
