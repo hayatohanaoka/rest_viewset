@@ -18,7 +18,7 @@ class CreateColumnMutation(graphene.relay.ClientIDMutation):
         title = inputs['title']
         description = inputs['description']
         column = Column.objects.create(
-            title=title, description=description, user_id=user)
+            title=title, description=description, user_id=user.id)
         
         return CreateColumnMutation(column=column)
 

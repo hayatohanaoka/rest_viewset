@@ -22,8 +22,7 @@ class JWTMiddleware:
         try:
             # 返り値： (user, token)
             user_auth_tuple = JWTAuthentication().authenticate(req)
-            print(user_auth_tuple)
             info.context.user = user_auth_tuple[0]
         except Exception as e:
             raise e
-        return next(root, info, **kwargs)  # 各リゾルバの呼び出し
+        return next(root, info, **kwargs)
