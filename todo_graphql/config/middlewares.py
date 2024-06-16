@@ -20,7 +20,7 @@ class JWTMiddleware:
         
         # 認証処理
         try:
-            # 返り値： (user, token)
+            # 返り値： (django user object, token auth dict)
             user_auth_tuple = JWTAuthentication().authenticate(req)
             info.context.user = user_auth_tuple[0]
         except Exception as e:
