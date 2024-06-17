@@ -57,7 +57,6 @@ class ToDoQuery(graphene.ObjectType):
         try:
             # _type: str Nodeのタイプ, _id: str NodeのグローバルID
             _type, _id = node.from_global_id(global_id)
-            print(_type, _id)
             return ToDo.objects.get(id=_id)
         except ObjectDoesNotExist:
             return None
