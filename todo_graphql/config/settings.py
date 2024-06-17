@@ -137,3 +137,11 @@ SIMPLE_JWT = {
     'SIGNING_KEY': read_key_file('private_key.pem'),
     'VERIFYING_KEY': read_key_file('public_key.pem')
 }
+
+GRAPHENE = {
+    'SCHEMA': 'app.schema.schema',
+    'MIDDLEWARE': [
+        'config.middlewares.JWTMiddleware',
+    ],
+    'RELAY_CONNECTION_MAX_LIMIT': 3
+}
