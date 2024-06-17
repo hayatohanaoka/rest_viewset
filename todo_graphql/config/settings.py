@@ -125,3 +125,15 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+def read_key_file(file_name):
+    with open(Path.joinpath(BASE_DIR, file_name), 'r') as f:
+        key = f.read()
+    f.close()
+    return key
+
+SIMPLE_JWT = {
+    'ALGORITHM': 'RS256',
+    'SIGNING_KEY': read_key_file('private_key.pem'),
+    'VERIFYING_KEY': read_key_file('public_key.pem')
+}
