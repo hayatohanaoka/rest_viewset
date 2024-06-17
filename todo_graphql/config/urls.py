@@ -7,9 +7,6 @@ from rest_framework_simplejwt.views import (
     TokenVerifyView
 )
 
-from app import schema
-from .middlewares import JWTMiddleware
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('graphql', GraphQLView.as_view(graphiql=True)),
