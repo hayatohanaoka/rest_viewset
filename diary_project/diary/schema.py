@@ -97,11 +97,16 @@ class DeleteDiary(relay.ClientIDMutation):
 
 
 class Query(graphene.ObjectType):
-    all_diaries = DjangoFilterConnectionField(DiaryType)
+    all_diaries = DjangoFilterConnectionField(
+        DiaryType, orderBy=graphene.List(of_type=graphene.String))
     diary = relay.Node.Field(DiaryType)
 
-    def resolve_hello(root, info):
-        return 'hello'
+    def resolve_all_diaries(root, info, **kwargs):
+        queryset = Diary.objects.all()
+        if 'orderBy' in kwargs:
+            order_by_fields = kwargs['orderBy']
+            queryset = queryset.order_by(*order_by_fields)
+        return queryset
 
 
 class Mutation(graphene.ObjectType):
