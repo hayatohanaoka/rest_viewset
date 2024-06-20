@@ -127,5 +127,8 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 GRAPHENE = {
-    'SCHEMA': 'diary.schema.schema'
+    'SCHEMA': 'diary.schema.schema',
+    'MIDDLEWARE': [
+        'config.middlewares.JWTMiddleware'
+    ]
 }
